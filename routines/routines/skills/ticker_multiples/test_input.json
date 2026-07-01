@@ -1,0 +1,6 @@
+{
+  "tickers": ["JDW.L", "IHG.L"],
+  "peers_limit": 5,
+  "years": 5,
+  "write_note": false
+}

@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ANTON — operator-led AI harness for M&amp;A and investment professionals</title>
+  <link rel="icon" type="image/png" href="anton-favicon.png">
+  <link rel="apple-touch-icon" href="anton-favicon.png">
+  <meta name="description"
+    content="ANTON is an operator-led AI harness for M&amp;A and investment professionals. It's designed to reduce the two biggest operational risks in AI-assisted dealmaking — data leakage and mathematical hallucinations: LLMs read, route, and draft while a deterministic Python engine runs your LBO and DCF models, and confidential deal materials stay on a local model.">
+
+  <!-- Open Graph / Twitter — link-unfurl card -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://antonaios.github.io/anton/">
+  <meta property="og:title" content="ANTON — operator-led AI harness for M&amp;A and investment professionals">
+  <meta property="og:description"
+    content="Designed to reduce the two biggest operational risks in AI-assisted dealmaking — data leakage and mathematical hallucinations: a deterministic Python engine does the maths, and confidential deal materials stay on a local model.">
+  <meta property="og:image" content="https://antonaios.github.io/anton/anton-social-card.jpg">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ANTON — operator-led AI harness for M&amp;A and investment professionals">
+  <meta name="twitter:description"
+    content="Designed to reduce the two biggest operational risks in AI-assisted dealmaking — data leakage and mathematical hallucinations: a deterministic Python engine does the maths, and confidential deal materials stay on a local model.">
+  <meta name="twitter:image" content="https://antonaios.github.io/anton/anton-social-card.jpg">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+    :root {
+      --bg: #09090b;
+      --bg2: #0e0e12;
+      --surface: rgba(255, 255, 255, .022);
+      --surface2: rgba(255, 255, 255, .04);
+      --line: rgba(255, 255, 255, .085);
+      --line2: rgba(255, 255, 255, .16);
+      --ink: #ececeb;
+      --ink2: #b3b2ac;
+      --ink3: #86857f;
+      --amber: #f4ad3d;
+      --amber-soft: #f6c478;
+      --amber-dim: rgba(244, 173, 61, .13);
+      --red: #e8635f;
+      --blue: #74a8e8;
+      --teal: #4ec9a6;
+      --mono: 'IBM Plex Mono', ui-monospace, monospace;
+      --sans: 'Inter', system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none
+    }
+
+    .glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(620px 420px at 50% -8%, rgba(244, 173, 61, .16), transparent 70%),
+        radial-gradient(900px 600px at 88% 4%, rgba(116, 168, 232, .06), transparent 70%);
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 28px
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--amber);
+      display: inline-flex;
+      align-items: center;
+      gap: 9px
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 22px;
+      height: 1px;
+      background: var(--amber);
+      opacity: .6
+    }
+
+    /* ── hero ── */
+    .hero {
+      padding: 118px 0 86px;
+      text-align: center
+    }
+
+    .mark {
+      font-weight: 800;
+      letter-spacing: -.04em;
+      line-height: .92;
+      font-size: clamp(72px, 13vw, 148px);
+      background: linear-gradient(180deg, #fff 12%, #cfcdc4 62%, #8c8a82 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent
+    }
+
+    .mark-img {
+      display: block;
+      margin: 0 auto;
+      width: clamp(240px, 44vw, 460px);
+      height: auto;
+      filter: drop-shadow(0 10px 48px rgba(244, 173, 61, .26))
+    }
+
+    .kicker {
+      margin: 13px auto 0;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      letter-spacing: .04em;
+      text-transform: none;
+      color: var(--ink2)
+    }
+
+    .lede {
+      margin: 30px auto 0;
+      max-width: 100%;
+      font-size: clamp(21px, 2.5vw, 30px);
+      font-weight: 600;
+      letter-spacing: -.015em;
+      line-height: 1.32;
+      color: #f3f3f1
+    }
+
+    .lede .am {
+      color: var(--amber)
+    }
+
+    .sub {
+      margin: 22px auto 0;
+      max-width: 100%;
+      font-size: 18px;
+      color: var(--ink2)
+    }
+
+    .cta {
+      margin-top: 38px;
+      display: flex;
+      gap: 13px;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .btn {
+      font-size: 14.5px;
+      font-weight: 500;
+      padding: 11px 20px;
+      border-radius: 11px;
+      border: 1px solid var(--line2);
+      color: var(--ink);
+      transition: .18s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .btn:hover {
+      border-color: var(--amber);
+      transform: translateY(-1px)
+    }
+
+    .btn.pri {
+      background: var(--amber);
+      color: #1a1303;
+      border-color: var(--amber);
+      font-weight: 600
+    }
+
+    .btn.pri:hover {
+      background: var(--amber-soft);
+      border-color: var(--amber-soft);
+      box-shadow: 0 8px 30px -8px rgba(244, 173, 61, .5)
+    }
+
+    .stats {
+      margin: 54px auto 0;
+      display: flex;
+      gap: 0;
+      justify-content: center;
+      flex-wrap: wrap;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+      max-width: 100%;
+      overflow: hidden
+    }
+
+    .stat {
+      flex: 1 1 150px;
+      padding: 22px 16px;
+      text-align: center;
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      justify-content: center
+    }
+
+    .stat:last-child {
+      border-right: 0
+    }
+
+    .stat b {
+      display: block;
+      font-size: 27px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      color: #fff
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 5px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--ink3)
+    }
+
+    .stat b .u {
+      color: var(--amber)
+    }
+
+    /* ── section scaffolding ── */
+    section.wrap {
+      padding-top: 104px;
+      padding-bottom: 40px
+    }
+
+    .shead {
+      margin-bottom: 38px
+    }
+
+    .shead h2 {
+      margin-top: 16px;
+      font-size: clamp(26px, 3.4vw, 36px);
+      font-weight: 700;
+      letter-spacing: -.025em;
+      line-height: 1.15;
+      text-align: center
+    }
+
+    .shead p {
+      margin-top: 14px;
+      font-size: 17px;
+      color: var(--ink2)
+    }
+
+    .thesis {
+      padding: 58px 0;
+      text-align: center
+    }
+
+    .thesis p {
+      max-width: 100%;
+      margin: 0 auto;
+      font-size: clamp(22px, 3vw, 32px);
+      font-weight: 600;
+      letter-spacing: -.02em;
+      line-height: 1.3;
+      color: #f2f1ef
+    }
+
+    .thesis .am {
+      color: var(--amber)
+    }
+
+    /* ── differentiator cards ── */
+    .grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr))
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      padding: 24px;
+      transition: .2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center
+    }
+
+    .card:hover {
+      border-color: var(--line2);
+      background: var(--surface2);
+      transform: translateY(-3px)
+    }
+
+    .card .ix {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--amber);
+      letter-spacing: .05em
+    }
+
+    .card h3 {
+      margin: 14px 0 9px;
+      font-size: 18.5px;
+      font-weight: 600;
+      letter-spacing: -.01em
+    }
+
+    .card p {
+      font-size: 14.5px;
+      color: var(--ink2);
+      line-height: 1.6
+    }
+
+    .card .mech {
+      margin-top: 13px;
+      padding-top: 13px;
+      border-top: 1px dashed var(--line);
+      font-size: 13px;
+      color: var(--ink3);
+      width: 100%
+    }
+
+    .card .mech b {
+      color: var(--ink2);
+      font-weight: 500
+    }
+
+    /* ── comparison table ── */
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 40px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--surface);
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      min-width: 800px;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 24px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle;
+    }
+
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .comparison-table th {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--amber);
+      border-bottom: 1px solid var(--line2);
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .comparison-table th img {
+      height: 28px;
+      transform: translateY(4px);
+    }
+
+    .comparison-table th.issue,
+    .comparison-table td.issue {
+      border-right: 1px dashed var(--line);
+    }
+
+    .comparison-table td.issue {
+      font-weight: 600;
+      color: #fff;
+      width: 18%;
+      font-size: 15.5px;
+    }
+
+    .comparison-table td.other {
+      width: 41%;
+      color: var(--ink3);
+      font-size: 14.5px;
+      line-height: 1.6;
+      border-right: 1px dashed var(--line);
+    }
+
+    .comparison-table td.anton {
+      width: 41%;
+      color: var(--ink);
+      font-size: 14.5px;
+      line-height: 1.6;
+    }
+
+    .comparison-table b {
+      color: #fff;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* ── screens / see it in action ── */
+    .shots {
+      display: flex;
+      flex-direction: column;
+      gap: 50px
+    }
+
+    .shotgroup {
+      display: flex;
+      flex-direction: column;
+      gap: 18px
+    }
+
+    .shotgroup .gl {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--amber);
+      display: inline-flex;
+      align-items: center;
+      gap: 9px
+    }
+
+    .shotgroup .gl::before {
+      content: "";
+      width: 22px;
+      height: 1px;
+      background: var(--amber);
+      opacity: .6
+    }
+
+    figure.shot {
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--surface);
+      transition: .2s ease
+    }
+
+    figure.shot:hover {
+      border-color: var(--line2);
+      transform: translateY(-3px)
+    }
+
+    figure.shot img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-bottom: 1px solid var(--line)
+    }
+
+    figure.shot figcaption {
+      padding: 15px 20px
+    }
+
+    figure.shot figcaption b {
+      display: block;
+      font-size: 15.5px;
+      font-weight: 600;
+      letter-spacing: -.01em;
+      color: var(--ink);
+      margin-bottom: 4px
+    }
+
+    figure.shot figcaption span {
+      font-size: 14px;
+      color: var(--ink2);
+      line-height: 1.55
+    }
+
+    figure.shot.tall {
+      max-width: 430px;
+      margin: 0 auto
+    }
+
+    /* ── architecture stack ── */
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 13px
+    }
+
+    .layer {
+      display: grid;
+      grid-template-columns: 148px 1fr;
+      gap: 20px;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px 22px
+    }
+
+    .layer .lk {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--ink);
+      font-weight: 500
+    }
+
+    .layer .lk span {
+      display: block;
+      color: var(--ink3);
+      font-size: 11.5px;
+      margin-top: 3px;
+      letter-spacing: .02em
+    }
+
+    .layer .ld {
+      font-size: 14.5px;
+      color: var(--ink2)
+    }
+
+    .layer.bridge {
+      border-color: rgba(244, 173, 61, .4);
+      background: linear-gradient(180deg, rgba(244, 173, 61, .05), rgba(244, 173, 61, .015))
+    }
+
+    .guard {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .guard .gd {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 0 4px rgba(244, 173, 61, .18);
+      flex: none
+    }
+
+    .guard b {
+      color: var(--amber-soft);
+      font-weight: 600;
+      font-size: 14px
+    }
+
+    .guard span {
+      color: var(--ink2);
+      font-size: 13.5px
+    }
+
+    .flowcap {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 13.5px;
+      color: var(--ink3)
+    }
+
+    .flowcap b {
+      color: var(--amber);
+      font-weight: 500
+    }
+
+    /* ── lanes ── */
+    .lanes {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr))
+    }
+
+    .lane {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px;
+      background: var(--surface);
+      position: relative;
+      overflow: hidden
+    }
+
+    .lane::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--dot, var(--ink3))
+    }
+
+    .lane h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 3px
+    }
+
+    .lane .verb {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--amber);
+      margin-bottom: 14px
+    }
+
+    .lane dl {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 5px 12px;
+      font-size: 13px
+    }
+
+    .lane dt {
+      color: var(--ink3)
+    }
+
+    .lane dd {
+      color: var(--ink);
+      text-align: right;
+      font-family: var(--mono);
+      font-size: 12.5px
+    }
+
+    .lane .det {
+      display: inline-flex;
+      gap: 4px;
+      margin-top: 2px
+    }
+
+    .lane .det i {
+      width: 14px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--line2)
+    }
+
+    .lane .det i.on {
+      background: var(--dot)
+    }
+
+    .lanenote {
+      max-width: 760px;
+      margin: 22px auto 0;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--ink3)
+    }
+
+    /* ── sensitivity ── */
+    .tiers {
+      display: flex;
+      flex-direction: column;
+      gap: 11px
+    }
+
+    .tier {
+      display: grid;
+      grid-template-columns: 130px 1fr auto;
+      gap: 18px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--tc, var(--ink3));
+      border-radius: 0 13px 13px 0;
+      padding: 16px 20px;
+      background: var(--surface)
+    }
+
+    .tier .tn {
+      font-family: var(--mono);
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--tc, var(--ink))
+    }
+
+    .tier .te {
+      font-size: 14px;
+      color: var(--ink2)
+    }
+
+    .tier .tr {
+      font-size: 12.5px;
+      font-family: var(--mono);
+      color: var(--ink3);
+      text-align: right;
+      white-space: nowrap
+    }
+
+    .pill {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .04em;
+      padding: 4px 11px;
+      border-radius: 20px;
+      border: 1px solid var(--amber);
+      color: var(--amber);
+      text-transform: uppercase
+    }
+
+    /* ── built today ── */
+    .two {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 1fr 1fr
+    }
+
+    .col {
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      padding: 24px;
+      background: var(--surface)
+    }
+
+    .col h4 {
+      font-size: 13px;
+      font-family: var(--mono);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 16px
+    }
+
+    .col.live h4 {
+      color: var(--teal)
+    }
+
+    .col.soon h4 {
+      color: var(--ink3)
+    }
+
+    .col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 11px
+    }
+
+    .col li {
+      font-size: 14.5px;
+      color: var(--ink2);
+      padding-left: 22px;
+      position: relative;
+      line-height: 1.5
+    }
+
+    .col li::before {
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-family: var(--mono);
+      font-size: 13px
+    }
+
+    .col.live li::before {
+      content: "›";
+      color: var(--teal)
+    }
+
+    .col.soon li::before {
+      content: "·";
+      color: var(--ink3);
+      font-size: 18px;
+      top: -2px
+    }
+
+    .col li b {
+      color: var(--ink);
+      font-weight: 600
+    }
+
+    /* ── footer ── */
+    footer {
+      border-top: 1px solid var(--line);
+      margin-top: 46px;
+      padding: 42px 0 70px;
+      text-align: center
+    }
+
+    footer .fl {
+      display: flex;
+      gap: 22px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      font-family: var(--mono);
+      font-size: 13px
+    }
+
+    footer .fl a {
+      color: var(--ink2);
+      transition: .15s
+    }
+
+    footer .fl a:hover {
+      color: var(--amber)
+    }
+
+    footer .fn {
+      font-size: 13px;
+      color: var(--ink3)
+    }
+
+    footer .fn b {
+      color: var(--ink2);
+      font-weight: 500
+    }
+
+    @media (max-width:680px) {
+      .layer {
+        grid-template-columns: 1fr;
+        gap: 8px
+      }
+
+      .tier {
+        grid-template-columns: 1fr;
+        gap: 7px
+      }
+
+      .tier .tr {
+        text-align: left
+      }
+
+      .two {
+        grid-template-columns: 1fr
+      }
+
+      .stat {
+        border-right: 0;
+        border-bottom: 1px solid var(--line)
+      }
+    }
+
+    .reveal {
+      opacity: 1
+    }
+
+    @media (prefers-reduced-motion:no-preference) {
+      .reveal {
+        opacity: 0;
+        transform: translateY(14px);
+        animation: rise .8s cubic-bezier(.2, .7, .2, 1) forwards
+      }
+
+      @keyframes rise {
+        to {
+          opacity: 1;
+          transform: none
+        }
+      }
+    }
+
+    /* ── lightbox: click a screenshot to view it full size ── */
+    figure.shot img {
+      cursor: zoom-in
+    }
+
+    .lbox {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(6, 6, 8, .93);
+      padding: 28px;
+      cursor: zoom-out
+    }
+
+    .lbox.open {
+      display: flex
+    }
+
+    .lbox img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      border: 1px solid var(--line2);
+      border-radius: 10px;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, .6)
+    }
+
+    .lbox .x {
+      position: absolute;
+      top: 18px;
+      right: 24px;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      letter-spacing: .12em;
+      color: var(--ink2)
+    }
+  </style>
+</head>
+
+<body>
+  <div class="glow"></div>
+
+  <header class="wrap hero">
+    <div class="reveal">
+      <img class="mark-img" src="anton-logo.png" alt="ANTON" width="1000" height="472">
+      <p class="lede">Operator-led AI harness designed for M&amp;A and investment professionals</p>
+      <p class="sub">Designed to reduce the two biggest operational risks in AI-assisted dealmaking: data leakage and
+        mathematical hallucinations<span style="display:block; height:12px;"></span>LLMs analyze CIMs, VDR docs, and
+        NDAs to route information and
+        draft investment committee narratives, while a deterministic Python engine strictly executes your LBO and DCF
+        modelling<span style="display:block; height:12px;"></span>Vault structured as a second brain, consolidating
+        information across Outlook, news, meeting notes. Available on demand to prepare agendas, track DD and draft deal
+        materials<span style="display:block; height:12px;"></span>Crucially, strict data governance ensures your highly
+        confidential deal materials remain confidential<sup>*</sup></p>
+      <p style="font-size: 13.5px; color: var(--ink3); margin-top: 16px; text-align: center;"><sup>*</sup> Data
+        confidentiality is
+        maintained by running sensitive documents on local LLMs or enterprise subscription models by default</p>
+      <div class="cta">
+        <a class="btn pri" href="#screens">See how it works</a>
+        <a class="btn" href="https://github.com/antonaios/anton">View on GitHub ↗</a>
+      </div>
+    </div>
+    <div class="stats reveal" style="animation-delay:.12s">
+      <div class="stat"><b>111<span class="u">·</span>49</b><span>endpoints / routers</span></div>
+      <div class="stat"><b>3,871</b><span>tests passing</span></div>
+      <div class="stat"><b>4</b><span>autonomous crews</span></div>
+      <div class="stat"><b>27</b><span>routine modules</span></div>
+      <div class="stat"><b>MIT</b><span>local-first</span></div>
+    </div>
+  </header>
+
+  <div class="thesis reveal">
+    <div class="wrap">
+      <p>Built to produce genuine first-drafts and actionable insights<span
+          style="display:block; height:12px;"></span>From LBO models to targeted IC memos, every output is heavily
+        structured, fully sourced, and operator-gated</p>
+    </div>
+  </div>
+
+  <section class="wrap" id="screens">
+    <div class="shead reveal">
+      <h2>See it in action</h2>
+      <p>The single-operator cockpit over a Markdown vault — the same deal flows through every lane, with the
+        sensitivity guard and audit trail wired through for institutional compliance.<sup>*</sup></p>
+      <p style="font-size: 13.5px; color: var(--ink3); margin-top: 16px; text-align: center;"><sup>*</sup> Shown with
+        synthetic demo content</p>
+    </div>
+    <div class="shots">
+      <div class="shotgroup reveal">
+        <div class="gl">The cockpit</div>
+        <figure class="shot"><img src="screens/desk-cockpit.webp"
+            alt="ANTON cockpit — chat-first over the active deal" loading="lazy" width="1600" height="1058">
+          <figcaption><b>Chat-first command surface</b><span>A clean composer over the deal's sessions — live markets,
+              the week ahead, the project rail, and real-time token spend. Interrogate deal docs or search the vault in
+              plain language.</span></figcaption>
+        </figure>
+        <figure class="shot"><img src="screens/workflow-palette.webp"
+            alt="The workflow command palette" loading="lazy" width="1480" height="1040">
+          <figcaption><b>One keystroke opens the palette</b><span>The full dealmaker's toolkit — screening, valuation,
+              management meetings, and transaction materials (teasers, CIMs, IC memos) — each a governed skill you fire
+              with a click or a slash-command.</span></figcaption>
+        </figure>
+      </div>
+      <div class="shotgroup reveal">
+        <div class="gl">Valuation — the engine does the maths</div>
+        <figure class="shot"><img src="screens/valuation-livemodel.webp"
+            alt="Live valuation model beside the chat — downside sensitivity grid" loading="lazy" width="1600"
+            height="756">
+          <figcaption><b>The model, live beside the chat</b><span>Run the base case and stress the downside grid in
+              place — IRR and covenant headroom across entry multiples and leverage — while the conversation stays in
+              context.</span></figcaption>
+        </figure>
+        <figure class="shot tall"><img src="screens/valuation-lbo.webp"
+            alt="Governed LBO intake — operator approves, the engine computes" loading="lazy" width="852" height="1082">
+          <figcaption><b>Governed intake, not a black box</b><span>The operator approves inputs and assumptions — each
+              one carrying a source — and a deterministic Python engine drives the Excel model cell-by-cell. No LLM ever
+              computes a number.</span></figcaption>
+        </figure>
+      </div>
+      <div class="shotgroup reveal">
+        <div class="gl">Confidentiality-aware routing &amp; budgets</div>
+        <figure class="shot"><img src="screens/routing.webp"
+            alt="Per-skill and per-crew model routing, cloud-fallback ladder, MNPI attestations" loading="lazy"
+            width="1600" height="1058">
+          <figcaption><b>The guard, made legible</b><span>Per-skill and per-crew model assignment, the cloud-fallback
+              ladder, and MNPI attestations — confidentiality-aware routing you can actually see.</span>
+          </figcaption>
+        </figure>
+        <figure class="shot"><img src="screens/budget.webp" alt="Token budget caps and monthly usage"
+            loading="lazy" width="1600" height="1058">
+          <figcaption><b>Token budgets and caps</b><span>Set monthly caps globally, per project, or per model; usage
+              tracks against the cap and warns before it bites — the hard cost block is separate.</span></figcaption>
+        </figure>
+      </div>
+
+      <div class="shotgroup reveal">
+        <div class="gl">Governance, taxonomy &amp; operator</div>
+        <figure class="shot"><img src="screens/taxonomy.webp" alt="Skill and routine sensitivity taxonomy"
+            loading="lazy" width="1600" height="1058">
+          <figcaption><b>Every skill carries a sensitivity</b><span>The taxonomy maps each skill and routine to a tier
+              and an allowed lane — the rules the guard enforces, gathered in one place.</span></figcaption>
+        </figure>
+        <figure class="shot"><img src="screens/operator-sectors.webp"
+            alt="Operator expertise sectors, watchlists and news coverage" loading="lazy" width="1600"
+            height="1058">
+          <figcaption><b>Tuned to one operator</b><span>Expertise sectors, watchlists, and news coverage that shape what
+              ANTON drafts and tracks — all editable without opening Obsidian.</span></figcaption>
+        </figure>
+        <figure class="shot"><img src="screens/keys.webp"
+            alt="Encrypted credential store — keys never touch the vault" loading="lazy" width="1600" height="1058">
+          <figcaption><b>Keys stay encrypted and local</b><span>Provider credentials are encrypted at rest (Fernet +
+              Windows DPAPI), entered once over loopback, and never displayed after save — secrets never touch the
+              vault.</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" id="why">
+    <div class="shead reveal">
+      <h2>Executive Differentiation Matrix</h2>
+    </div>
+    <div class="table-wrapper reveal">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th class="issue">Issue</th>
+            <th class="other">Generic AI Platforms</th>
+            <th class="anton"><img src="anton-logo.png" alt="ANTON"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="issue">Valuation Engine</td>
+            <td class="other"><b>Black-Box Computations:</b> Relies on non-deterministic LLMs to calculate figures,
+              leading to frequent mathematical hallucinations and broken dynamic formulas.</td>
+            <td class="anton"><b>Deterministic Execution:</b> Zero numbers are computed by the LLM. Financial modeling
+              tasks shell out to a native Python engine that drives versioned Excel templates (LBO, DCF, Comps)
+              cell-by-cell.</td>
+          </tr>
+          <tr>
+            <td class="issue">Data Confidentiality</td>
+            <td class="other"><b>Opaque Cloud Risk:</b> Relies on generic cloud privacy policies; high operational risk
+              of leaking sensitive Virtual Data Room (VDR) contents or deal parameters.</td>
+            <td class="anton"><b>Structurally Enforced Local Isolation:</b> Governed by a strict sensitivity guard
+              mapping files into four distinct tiers. <code>Confidential</code> and <code>MNPI</code> data tiers default
+              to a local-only GPU, ensuring data never leaves the machine.</td>
+          </tr>
+          <tr>
+            <td class="issue">Execution Governance</td>
+            <td class="other"><b>Unchecked Background Swarms:</b> Opaque agentic loops execute hundreds of hidden
+              background calls, generating highly unpredictable, non-repeatable outputs.</td>
+            <td class="anton"><b>Four Explicit Processing Lanes:</b> The operator selects the exact lane (Chat, Single
+              Skill, Composite, or Autonomous Crew) via specific verbs, dictating hard token ceilings and explicit
+              determinism boundaries.</td>
+          </tr>
+          <tr>
+            <td class="issue">Budget Control</td>
+            <td class="other"><b>Unmonitored Runaway Costs:</b> Opaque architectures lack granular tracking, risking
+              surprise API credit card overruns during intensive deal sprints.</td>
+            <td class="anton"><b>Granular Token Budgeting:</b> Features strict monthly budget caps that can be
+              configured globally, per individual model, or mapped directly to a specific deal project with proactive
+              friction warnings.</td>
+          </tr>
+          <tr>
+            <td class="issue">Memory Governance</td>
+            <td class="other"><b>Silent Database Overwrites:</b> Automatically appends unverified data or vector
+              embeddings to a shared database, creating unvouched facts and corrupting deal history.</td>
+            <td class="anton"><b>Principal-Gated Knowledge Base:</b> Waterfall knowledge structure on a per project &gt;
+              per sector &gt; expert essence, feeding from all available sources. System conclusions are delivered
+              purely as isolated proposals. Fact updates to your permanent Markdown vault require explicit operator
+              sign-off—never overwritten, never silent.</td>
+          </tr>
+          <tr>
+            <td class="issue">Institutional Audit Trail</td>
+            <td class="other"><b>Opaque Operations:</b> Opaque systems offer zero underlying insight into why a model
+              arrived at a particular conclusion, making validation impossible.</td>
+            <td class="anton"><b>Comprehensive Telemetry:</b> Every routine run and model call generates a structured,
+              queryable trail through a sanitize-then-redact pipeline, logging provider, model, token cost, sensitivity
+              tier, and execution lane.</td>
+          </tr>
+          <tr>
+            <td class="issue">Continuous Optimization</td>
+            <td class="other"><b>Static Prompt Architectures:</b> Requires manual, complex prompt engineering or
+              expensive code-level adjustments to align with changing workflow preferences.</td>
+            <td class="anton"><b>Heuristic Feedback Loops:</b> Actively monitors recurring follow-up query patterns to
+              cluster behaviors and propose concrete, version-controlled modifications to its own underlying templates
+              and operating rules.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="wrap" id="architecture">
+    <div class="shead reveal">
+      <h2>Five layers that meet only across a boundary</h2>
+      <p>Layers communicate over the filesystem, HTTP, or a subprocess — never by importing each other. That discipline
+        keeps the math auditable, data contained, and the heavy engines swappable.</p>
+    </div>
+    <div class="stack">
+      <div class="layer reveal">
+        <div class="lk">vault<span>markdown memory</span></div>
+        <div class="ld">Plain-Markdown canonical store — every note, decision, and source is a <code>.md</code> file
+          with mandatory frontmatter. Git-managed; the file <i>is</i> the record.</div>
+      </div>
+      <div class="layer reveal">
+        <div class="lk">routines<span>the bridge</span></div>
+        <div class="ld">The FastAPI core — the only layer that touches everything. ~111 loopback endpoints, the
+          scheduler, encrypted credentials, telemetry, and the governance core.
+          <div class="guard"><b>Governance core</b><span>— sensitivity guard · cost gate · audit. Every lane passes
+              through here.</span></div>
+        </div>
+      </div>
+      <div class="layer reveal">
+        <div class="lk">engine<span>valuation</span></div>
+        <div class="ld">A Python wrapper that drives Excel templates through a cell-map registry. It computes and
+          self-checks; the model only picks inputs and narrates.</div>
+      </div>
+      <div class="layer reveal">
+        <div class="lk">dashboard<span>cockpit</span></div>
+        <div class="ld">A React + TypeScript cockpit — chat shell, workflow tiles, an inbox of pending proposals,
+          burn-rate and routing panels.</div>
+      </div>
+      <div class="layer reveal">
+        <div class="lk">sidecars<span>composite · crew</span></div>
+        <div class="ld">Two heavier orchestration runtimes kept out-of-process — reached over HTTP or a subprocess,
+          never vendored in.</div>
+      </div>
+    </div>
+    <div class="reveal" style="margin-top:36px">
+      <svg viewBox="0 0 840 952" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="arch2-t arch2-d"
+        width="100%" style="display:block;height:auto;max-width:840px;margin:0 auto"
+        font-family="Inter, system-ui, sans-serif">
+        <title id="arch2-t">ANTON end-to-end architecture</title>
+        <desc id="arch2-d">Operator inputs flow through ingestion routines into the Markdown vault. The vault is indexed
+          into a local embedding index and served by the FastAPI bridge (API and dispatch plus the governance core:
+          sensitivity guard, cost gate, audit). The guard routes sensitive work to a local on-device LLM and
+          non-sensitive work to a cloud lane; a deterministic Excel engine does the maths. Four dispatch lanes feed
+          read-and-synthesis outputs, and a learning loop proposes operator-gated rule edits appended back to the vault
+          on approval.</desc>
+        <defs>
+          <marker id="arch2-ah" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto"
+            markerUnits="userSpaceOnUse">
+            <path d="M0,0 L7,3 L0,6 z" fill="#6f6e64" />
+          </marker>
+        </defs>
+        <rect x="2" y="2" width="836" height="948" rx="18" fill="#0a0a0d" stroke="rgba(255,255,255,.06)" />
+        <rect x="74" y="458" width="420" height="178" rx="14" fill="rgba(255,255,255,.045)"
+          stroke="rgba(255,255,255,.13)" />
+        <text x="250" y="477" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="11"
+          fill="#b3b2ac">FastAPI bridge · loopback only</text>
+        <g fill="none" stroke="#5d5c56" stroke-width="1.3">
+          <path d="M458,90 L458,110" marker-end="url(#arch2-ah)" />
+          <path d="M458,182 L458,244" marker-end="url(#arch2-ah)" />
+          <path d="M416,304 C362,330 300,340 264,360" marker-end="url(#arch2-ah)" />
+          <path d="M384,286 C150,330 118,468 216,500" marker-end="url(#arch2-ah)" />
+          <path d="M248,418 C256,446 262,464 272,480" marker-end="url(#arch2-ah)" />
+          <path d="M470,408 C432,438 380,470 354,494" marker-end="url(#arch2-ah)" />
+          <path d="M284,516 L278,546" marker-end="url(#arch2-ah)" />
+          <path d="M352,506 C432,522 472,546 512,566" marker-end="url(#arch2-ah)" />
+          <path d="M214,592 C170,622 132,656 110,684" marker-end="url(#arch2-ah)" />
+          <path d="M273,606 L273,684" marker-end="url(#arch2-ah)" />
+          <path d="M356,580 C412,612 442,656 462,684" marker-end="url(#arch2-ah)" />
+          <path d="M473,732 L473,762" marker-end="url(#arch2-ah)" />
+          <path d="M556,802 C598,826 582,850 602,872" marker-end="url(#arch2-ah)" />
+        </g>
+        <g fill="none" stroke="#5d5c56" stroke-width="1.3" stroke-dasharray="4 4">
+          <path d="M712,898 C802,838 802,400 534,286" marker-end="url(#arch2-ah)" />
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#86857f" text-anchor="middle">
+          <text x="458" y="216">atomic write · frontmatter contract</text>
+          <text x="236" y="340">indexed</text>
+          <text x="428" y="448">typed HTTP</text>
+          <text x="606" y="430">operator-gated proposal</text>
+          <text x="752" y="566">appended on approval</text>
+          <text x="106" y="656">default · all sensitive work</text>
+          <text x="272" y="650">only if non-sensitive AND</text>
+          <text x="272" y="662">plan-tier permits</text>
+          <text x="486" y="858">recurring follow-ups</text>
+        </g>
+        <rect x="370" y="22" width="176" height="68" rx="34" fill="rgba(255,255,255,.025)"
+          stroke="rgba(255,255,255,.13)" />
+        <text x="458" y="46" text-anchor="middle" font-size="11.5" font-weight="500" fill="#ececeb">Operator inputs
+          —</text>
+        <text x="458" y="61" text-anchor="middle" font-size="10" fill="#86857f">meetings, web,</text>
+        <text x="458" y="75" text-anchor="middle" font-size="10" fill="#86857f">documents, notes</text>
+        <rect x="368" y="114" width="180" height="68" rx="10" fill="rgba(255,255,255,.025)"
+          stroke="rgba(255,255,255,.13)" />
+        <text x="458" y="138" text-anchor="middle" font-size="11.5" font-weight="500" fill="#ececeb">Ingestion routines
+          —</text>
+        <text x="458" y="153" text-anchor="middle" font-size="10" fill="#86857f">transcripts, news, PDF</text>
+        <text x="458" y="167" text-anchor="middle" font-size="10" fill="#86857f">intake, extractors</text>
+        <path d="M382,250 L382,302 A76,9 0 0 0 534,302 L534,250 A76,9 0 0 1 382,250 Z" fill="rgba(255,255,255,.03)"
+          stroke="rgba(255,255,255,.18)" />
+        <path d="M382,250 A76,9 0 0 0 534,250" fill="none" stroke="rgba(255,255,255,.18)" />
+        <text x="458" y="281" text-anchor="middle" font-size="11.5" font-weight="500" fill="#ececeb">The Vault —
+          Markdown</text>
+        <text x="458" y="296" text-anchor="middle" font-size="10" fill="#86857f">canonical memory</text>
+        <path d="M182,362 L182,406 A60,8 0 0 0 302,406 L302,362 A60,8 0 0 1 182,362 Z" fill="rgba(255,255,255,.03)"
+          stroke="rgba(255,255,255,.18)" />
+        <path d="M182,362 A60,8 0 0 0 302,362" fill="none" stroke="rgba(255,255,255,.18)" />
+        <text x="242" y="390" text-anchor="middle" font-size="11" font-weight="500" fill="#ececeb">Local embedding
+          index</text>
+        <rect x="414" y="372" width="120" height="36" rx="8" fill="rgba(255,255,255,.025)"
+          stroke="rgba(255,255,255,.13)" />
+        <text x="474" y="394" text-anchor="middle" font-size="11" font-weight="500" fill="#ececeb">React
+          dashboard</text>
+        <rect x="220" y="482" width="132" height="34" rx="8" fill="rgba(255,255,255,.04)"
+          stroke="rgba(255,255,255,.2)" />
+        <text x="286" y="503" text-anchor="middle" font-size="11" font-weight="500" fill="#ececeb">API and
+          dispatch</text>
+        <polygon points="187,576 212,547 332,547 357,576 332,605 212,605" fill="rgba(244,173,61,.08)" stroke="#f4ad3d"
+          stroke-width="1.3" />
+        <text x="272" y="571" text-anchor="middle" font-size="11" font-weight="600" fill="#ececeb">Governance core
+          —</text>
+        <text x="272" y="585" text-anchor="middle" font-size="9.5" fill="#f6c478">sensitivity guard, cost</text>
+        <text x="272" y="598" text-anchor="middle" font-size="9.5" fill="#f6c478">gate, audit</text>
+        <rect x="514" y="552" width="158" height="50" rx="10" fill="rgba(255,255,255,.025)"
+          stroke="rgba(255,255,255,.13)" />
+        <text x="593" y="574" text-anchor="middle" font-size="11" font-weight="500" fill="#ececeb">Valuation engine —
+          Excel</text>
+        <text x="593" y="589" text-anchor="middle" font-size="10" fill="#86857f">templates, deterministic</text>
+        <rect x="20" y="686" width="172" height="46" rx="10" fill="rgba(255,255,255,.025)"
+          stroke="rgba(255,255,255,.13)" />
+        <text x="106" y="713" text-anchor="middle" font-size="11" font-weight="500" fill="#ececeb">Local LLM · on-device
+          GPU</text>
+        <rect x="214" y="686" width="118" height="46" rx="10" fill="rgba(255,255,255,.025)"
+          stroke="rgba(255,255,255,.13)" />
+        <text x="273" y="713" text-anchor="middle" font-size="11" font-weight="500" fill="#ececeb">Cloud LLM lane</text>
+        <rect x="386" y="686" width="174" height="46" rx="10" fill="rgba(255,255,255,.025)"
+          stroke="rgba(255,255,255,.13)" />
+        <text x="473" y="707" text-anchor="middle" font-size="11" font-weight="500" fill="#ececeb">Four dispatch lanes —
+          chat</text>
+        <text x="473" y="721" text-anchor="middle" font-size="10" fill="#86857f">· skill · composite · crew</text>
+        <rect x="386" y="764" width="174" height="68" rx="10" fill="rgba(255,255,255,.025)"
+          stroke="rgba(255,255,255,.13)" />
+        <text x="473" y="788" text-anchor="middle" font-size="11.5" font-weight="500" fill="#ececeb">Read and synthesis
+          —</text>
+        <text x="473" y="803" text-anchor="middle" font-size="10" fill="#86857f">dashboard, Obsidian,</text>
+        <text x="473" y="817" text-anchor="middle" font-size="10" fill="#86857f">recall, briefs</text>
+        <rect x="536" y="874" width="176" height="58" rx="10" fill="rgba(255,255,255,.025)"
+          stroke="rgba(255,255,255,.13)" />
+        <text x="624" y="898" text-anchor="middle" font-size="11" font-weight="500" fill="#ececeb">Learning loop —
+          proposes</text>
+        <text x="624" y="913" text-anchor="middle" font-size="10" fill="#86857f">rule edits, operator-gated</text>
+      </svg>
+    </div>
+    <p class="flowcap reveal">The guard is one <code>before_llm_call</code> hook registered at startup. A single skill,
+      a step inside a composite, and every role inside a crew all flow through it. <b>No lane bypasses it.</b></p>
+  </section>
+
+  <section class="wrap" id="lanes">
+    <div class="shead reveal">
+      <h2>One request, one lane — and you choose it</h2>
+      <p>In the current LLM environment there is a tradeoff between intelligence (quality), privacy (LLM providers using
+        data to train their models) and cost (API/subscription for cloud; very high costs for local hardware). Anton
+        gives the operator the flexibility to use any provider or mix providers including local LLM to maximise budget.
+      </p>
+    </div>
+    <div class="lanes">
+      <div class="lane reveal" style="--dot:var(--teal)">
+        <h4>Chat</h4>
+        <div class="verb">type in the composer</div>
+        <dl>
+          <dt>Determinism</dt>
+          <dd><span class="det"><i class="on"></i><i class="on"></i><i class="on"></i></span></dd>
+          <dt>Latency</dt>
+          <dd>2–10s</dd>
+          <dt>LLM calls</dt>
+          <dd>1</dd>
+        </dl>
+      </div>
+      <div class="lane reveal" style="--dot:var(--teal);animation-delay:.05s">
+        <h4>Single skill</h4>
+        <div class="verb">/recall · /comps · /lbo</div>
+        <dl>
+          <dt>Determinism</dt>
+          <dd><span class="det"><i class="on"></i><i class="on"></i><i class="on"></i></span></dd>
+          <dt>Latency</dt>
+          <dd>3–30s</dd>
+          <dt>LLM calls</dt>
+          <dd>0–1</dd>
+        </dl>
+      </div>
+      <div class="lane reveal" style="--dot:var(--amber);animation-delay:.1s">
+        <h4>Composite</h4>
+        <div class="verb">/pitch · /teaser · /ic-memo</div>
+        <dl>
+          <dt>Determinism</dt>
+          <dd><span class="det"><i class="on"></i><i class="on"></i><i></i></span></dd>
+          <dt>Latency</dt>
+          <dd>minutes</dd>
+          <dt>LLM calls</dt>
+          <dd>declared</dd>
+        </dl>
+      </div>
+      <div class="lane reveal" style="--dot:var(--red);animation-delay:.15s">
+        <h4>Autonomous crew</h4>
+        <div class="verb">/triage · /explore · /debate</div>
+        <dl>
+          <dt>Determinism</dt>
+          <dd><span class="det"><i class="on"></i><i></i><i></i></span></dd>
+          <dt>Latency</dt>
+          <dd>minutes</dd>
+          <dt>LLM calls</dt>
+          <dd>10s–100s</dd>
+        </dl>
+      </div>
+    </div>
+    <p class="lanenote reveal">Determinism = will the same request give the same answer? More bars = more repeatable (a
+      fixed engine call); fewer = emergent (agents reason freely, so output varies). The left lanes are cheap and exact;
+      the right lanes are powerful but variable.</p>
+  </section>
+
+  <section class="wrap" id="sensitivity">
+    <div class="shead reveal">
+      <h2>Confidentiality level decides where a model may run</h2>
+      <p>Every note carries a tier. The guard maps tier to an allowed lane <i>before</i> dispatch, and defaults to the
+        more restrictive lane when uncertain.</p>
+    </div>
+    <div class="tiers">
+      <div class="tier reveal" style="--tc:var(--ink3)">
+        <div class="tn">public</div>
+        <div class="te">Listed-company financials, press releases, sector statistics.</div>
+        <div class="tr">any cloud lane</div>
+      </div>
+      <div class="tier reveal" style="--tc:var(--blue);animation-delay:.04s">
+        <div class="tn">internal</div>
+        <div class="te">Your internal thesis on public material; no confidential party names.</div>
+        <div class="tr">cloud frontier model</div>
+      </div>
+      <div class="tier reveal" style="--tc:var(--amber);animation-delay:.08s">
+        <div class="tn">confidential</div>
+        <div class="te">Project codenames, target &amp; sponsor names, NDA contents, VDR docs.</div>
+        <div class="tr"><span class="pill">local only</span></div>
+      </div>
+      <div class="tier reveal" style="--tc:var(--red);animation-delay:.12s">
+        <div class="tn">MNPI</div>
+        <div class="te">Pre-announcement results, embargoed news, inside information.</div>
+        <div class="tr"><span class="pill">never leaves</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" id="status">
+    <div class="shead reveal">
+      <h2>Single-operator, local-first, genuinely in use</h2>
+      <p>A work in progress, shared for review. Honest about what's live and what isn't.</p>
+    </div>
+    <div class="two">
+      <div class="col live reveal">
+        <h4>Live today</h4>
+        <ul>
+          <li><b>Three of the four lanes</b> — chat, single skills, and 4 autonomous crews running.</li>
+          <li><b>~111 endpoints</b> across 49 router files; 3,871 tests across 249 files.</li>
+          <li><b>Overnight automations</b> — briefings, trackers, sector reads.</li>
+          <li><b>LBO end-to-end</b> through the engine, captured back to the vault as a gated proposal.</li>
+          <li><b>Valuation comparables</b> — Anton will understand target and identify comparable transactions and
+            listed companies &amp; provide strategic rationale for operator's approval.</li>
+          <li>Per-task routing, operator override windows, budget gating, per-provider ceilings.</li>
+        </ul>
+      </div>
+      <div class="col soon reveal" style="animation-delay:.06s">
+        <h4>In Progress</h4>
+        <ul>
+          <li><b>Buyer tracking &amp; NDA</b> — pending skill to track buyer engagement from email and batch
+            personalised draft NDAs (Python engine, not LLM).</li>
+          <li><b>Composite lane</b> — composite actions (pitch, teaser, IC paper).</li>
+          <li><b>DCF </b> — blocked on per-template engine authoring.</li>
+          <li><b>Outlook &amp; calendar ingestion</b> — pending Microsoft Graph app registration.</li>
+          <li><b>Cross-machine deploy</b> — local-first by design; no managed service.</li>
+          <li><b>HoT &amp; SPA review</b> — implement skill to draft Heads of Terms (based on learnings &amp; expertise)
+            and review SPA.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="reveal"
+      style="text-align: center; margin-top: 46px; color: var(--ink3); font-size: 14.5px; animation-delay: .12s; font-style: italic;">
+      "He grimly does his work and sits motionless until it's time to work again, we can all take a page from his book"
+      - Gilfoyle Bertram
+    </p>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="fl">
+        <a href="https://github.com/antonaios/anton">GitHub ↗</a>
+        <a href="OVERVIEW.md">Architecture overview</a>
+        <a href="../README.md">Readme</a>
+        <a href="../LICENSE">MIT License</a>
+      </div>
+      <p class="fn">A public mirror of a working private system · ships <b>code + a vault skeleton only</b> · no real
+        content, no secrets, no history.</p>
+    </div>
+  </footer>
+
+  <div class="lbox" id="lbox" aria-hidden="true">
+    <span class="x">ESC &times;</span>
+    <img alt="Screenshot, full size">
+  </div>
+  <script>
+    (function () {
+      var lb = document.getElementById('lbox'), lbimg = lb.querySelector('img');
+      document.querySelectorAll('#screens figure.shot img').forEach(function (im) {
+        im.addEventListener('click', function () {
+          lbimg.src = im.currentSrc || im.src;
+          lb.classList.add('open');
+          lb.setAttribute('aria-hidden', 'false');
+        });
+      });
+      function close() {
+        lb.classList.remove('open');
+        lb.setAttribute('aria-hidden', 'true');
+        lbimg.removeAttribute('src');
+      }
+      lb.addEventListener('click', close);
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    })();
+  </script>
+</body>
+
+</html>

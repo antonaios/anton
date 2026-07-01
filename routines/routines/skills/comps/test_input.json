@@ -1,0 +1,10 @@
+{
+  "deal_name": "DemoDeal",
+  "target": "DemoDeal",
+  "parent_sector": "hospitality",
+  "stage": 0,
+  "workspace_type": "project",
+  "workspace_name": "DemoDeal",
+  "workspace_sensitivity": "internal",
+  "today": "2026-06-01"
+}

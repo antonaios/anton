@@ -1,0 +1,241 @@
+# Agentic OS — Template Registry
+#
+# Each entry defines one Excel template the engine drives. This file is the
+# durable spec; the .xlsx itself is the calculator. The engine never modifies
+# the registered template — every run copies it to a fresh output file.
+#
+# Cell-reference forms accepted in `inputs:` / `outputs:` / `post_recalc_hardcode:`:
+#   - "Sheet!A1"           A1-style, sheet-qualified (most general)
+#   - "Sheet!A1:B10"       2D range — output reads as nested list
+#   - "Named_range"        workbook-scope defined name
+#   - "'Sheet With Space'!A1"  quoted sheet for names with spaces
+#
+# Prefer named ranges over A1 refs — they survive row inserts above. The v2
+# LBO template added ~28 named ranges covering every user input.
+
+templates:
+
+  # =====================================================================
+  # LBO  v4.0  (DemoDeal-shape template)  — canonical 2026-05-19
+  # ---------------------------------------------------------------------
+  # First skill wired against the foundation. Iterated through v1 → v4:
+  #
+  #   v1 (Project_x_LBO_date.xlsx, original)
+  #       - As-supplied by operator. Carried 271 S&P CapIQ junk named
+  #         ranges + 2 LAMBDA-sentinel _xleta names, an orphan
+  #         Financing_EBITDA → empty I37 named range, and a hidden
+  #         DemoCo_Financials sheet (P&L from a prior engagement).
+  #
+  #   v2 (clean + named ranges, archived)
+  #       - 271 junk + 2 _xleta names stripped via Excel COM + zip-XML
+  #         purge; orphan Financing_EBITDA deleted; hidden DemoCo_Financials
+  #         removed; 28 new workbook-scope named ranges added covering
+  #         every confirmed user input.
+  #       - Build path: openpyxl initially, but openpyxl's save strips
+  #         calcChain.xml and cached values. After Excel re-opens, the
+  #         iterative-calc circular ref (LBO debt/fees loop + OpModel_Link
+  #         NWC self-reference) failed to converge and rows 51-53 of
+  #         OpModel_Link came up blank. Rebuilt entirely via xlwings COM
+  #         which preserves the calc chain.
+  #
+  #   v3 (Min_cash relocated, archived)
+  #       - Min_cash named range moved H50 → M50 per operator, then back
+  #         to H50 ("my mistake, the min cash should have remained in H50").
+  #       - LBO!G89 formula switched from A1 ref (`=-H50`) to named range
+  #         (`=-Min_cash`) so future cell moves don't break the bridge.
+  #       - Stale `<leave 0 for now!` text note at I50 cleared.
+  #
+  #   v4 (Sources & Uses cash double-count fixed) — CURRENT
+  #       - Cell LBO!G90 had `=+G89+I54` (TLA minus Cash). G89 was already
+  #         the Cash USE = -Min_cash. G92 = SUM(G89:G91) therefore counted
+  #         Cash twice → sponsor equity at entry was overstated by exactly
+  #         Min_cash (e.g. 97.34 instead of 87.34 at Min_cash=10), and
+  #         IRR/MOIC at exit understated.
+  #       - Fix: G90 → `=+I54` (gross TLA quantum). Cash now only appears
+  #         once, in G89. Net Debt at close = TLA + TLB − Cash, correct.
+  #         Sensitivity: each £1 of Min_cash → +£1 sponsor equity, 1:1.
+  #
+  # Surviving sheets: Client_FS (client financials — generic deal slot; overwrite per deal),
+  # OpModel_Link (bridge), LBO (the model), 1PageOutput, GBPSONIA.
+  #
+  # Circular-break: the entry-multiple sensitivity grid (B101:Q120) is
+  # centred on M103 (the current entry multiple); the exit-multiple
+  # sensitivity row uses S118 / AC186 / X191 as hardcoded paste-values
+  # to break a circular reference. The engine handles this via
+  # post_recalc_hardcode with iterative convergence.
+  # =====================================================================
+  lbo:
+    path: "os-templates/Project_x_LBO_date.xlsx"
+    version: "4.0"
+    description: "DemoDeal-shape sponsor LBO v4 — clean + named ranges + S&U cash-double-count fix. 2 historicals + outlook + 6yr forecast, stub period, ord/pref cap structure, RCF + TLA/TLB, IRR/MOIC sensitivity. Min cash funded from sponsor equity 1:1."
+
+    # ----------------------------------------------------------------- inputs
+    # Required inputs. Engine refuses to run if any are missing.
+    inputs:
+      # ─── Basics ──────────────────────────────────────────────────────
+      first_fye:           "First_FYE"           # I5  — first historical fiscal year end date (drives the 9-period timeline I5:Q5)
+      project_name:        "Project_name"        # I8
+      scenario_provider:   "Scenario_provider"   # I9  — usually "Management"
+      currency:            "Currency"            # I10 — "GBP", "EUR", "USD"
+      fye_post_acq:        "FYE_post_acq"        # I11 — first FYE after acquisition; drives stub
+      tax_rate:            "Tax_rate"            # I12 — effective tax (decimal, e.g. 0.25)
+
+      # ─── Acquisition assumptions ─────────────────────────────────────
+      acq_multiple:        "Acq_multiple"        # I25 — EV / EBITDA at entry
+      ebitda_basis:        "EBITDA_basis"        # H26 — "Adj" / "Mgmt" / "Reported" — index into the 4 LTM bases
+      acq_ebitda:          "Acq_EBITDA"          # M28 — acquisition LTM EBITDA (£m)
+      acq_date:            "Acq_date"            # I28 — acquisition date; drives stub vs I11
+      holding_period:      "Holding_period"      # I30 — years
+      ma_fees:             "MA_fees"             # I32 — M&A transaction fees (£m)
+      step_multiple:       "Step_multiple"       # J25 — 0.5x step for the entry-multiple sensitivity ladder
+
+      # ─── Financing & cap table ───────────────────────────────────────
+      debt_ebitda:         "Debt_EBITDA"         # I38 — debt-to-EBITDA leverage multiple
+      min_equity:          "Min_equity"          # I40 — minimum equity % (decimal)
+      tla_split:           "TLA_split"           # H54 — Term Loan A as % of total term debt; TLB = 1 - TLA
+      rcf_quantum:         "RCF_quantum"         # H56 — Revolver quantum (£m)
+      rcf_switch:          "RCF_switch"          # I56 — 1/0 yes/no
+      pref_interest:       "Pref_interest"       # I66 — preferred-equity interest rate (decimal)
+
+      # ─── Acquisition section ─────────────────────────────────────────
+      existing_net_debt:   "Existing_net_debt"   # I81 — input 0 if not known yet
+
+    # Optional inputs. May be omitted; if omitted the cell keeps its current
+    # template value.
+    optional_inputs:
+      # Scenario switches — currently DemoDeal-specific. Operator's
+      # convention is 0/1 toggles for various M&A / efficiency scenarios.
+      scenario_1:          "Scenario_1"          # I17
+      scenario_2:          "Scenario_2"          # I18
+      scenario_3:          "Scenario_3"          # I19
+      scenario_selected:   "Scenario_selected"   # I20 — primary scenario number
+      scenario_5:          "Scenario_5"          # I21
+      # Cap structure splits (Ords column vs Prefs column). Cells not yet
+      # named — exposed via A1 ref. Add named ranges to the template next
+      # time the cap-structure convention is firmed up.
+      sweet_ord_pct:       "LBO!H59"             # 0.01 in current
+      mgmt_ord_pct:        "LBO!H63"             # 0.15 in current
+      sponsor_ord_pct:     "LBO!H62"             # 0 in current — derived as 1-mgmt-sweet elsewhere
+      ord_pref_split:      "LBO!H66"             # check semantics with operator
+      min_cash:            "Min_cash"            # H50 — minimum cash floor (£m)
+
+    # ---------------------------------------------------------------- outputs
+    outputs:
+      # ─── Output summary table (the IC-memo quote block) ──────────────
+      # B101:Q120 — operator-confirmed as the relevant 2D table. Includes
+      # TEV at 9 entry multiples × 4 EBITDA bases, plus the formatted
+      # "IRR% / MOICx" sensitivity grid at rows 116-120 (5 exit multiples
+      # × 9 entry multiples).
+      output_summary_table:  "LBO!B101:Q120"
+
+      # ─── Headline returns matrices (numeric, full precision) ─────────
+      irr_grid:              "LBO!Y187:AG195"    # 9 exit × 9 entry IRR values (decimal)
+      # MOIC grid lives next to the IRR grid; operator to confirm exact addresses
+      # in first end-to-end run. Treating B101:Q120 as authoritative for now.
+
+      # ─── Headline values used in narration ──────────────────────────
+      # IMPORTANT: the LBO S&U bridge runs G89:G96. Row labels:
+      #   G89=Cash   G90=TLA  G91=TLB  G92=Total Net Debt
+      #   G93=New sponsor equity   G94=Management equity
+      #   G95=Total equity         G96=Total Sources (=FTEV)
+      ftev:                  "LBO!I76"           # FTEV at current entry multiple (= G96)
+      entry_multiple_chosen: "Acq_multiple"      # I25 (echo)
+      exit_multiple_chosen:  "Exit_multiple"     # I27 = I25 (echo)
+      tla_quantum:           "LBO!G90"           # Term Loan A (gross, post v4 fix)
+      tlb_quantum:           "LBO!G91"           # Term Loan B (gross)
+      net_debt_at_close:     "LBO!G92"           # TLA + TLB − Min_cash (post v4 fix)
+      sponsor_equity:        "LBO!G93"           # New sponsor equity cheque
+      management_equity:     "LBO!G94"           # Management rollover
+      total_equity:          "LBO!G95"           # Total equity (sponsor + mgmt + sweet)
+      stub_period:           "stub"              # I29 — fraction of a year
+      sources_and_uses:      "LBO!G89:H97"       # the bridge table (rows × value/% columns)
+
+    # -------------------------------------------------------- post-recalc hardcode
+    # DemoDeal-specific circular break: M103 is the entry multiple display
+    # `=ROUND(M102/G103,3)` — its value depends on the chosen `Acq_multiple`
+    # and step. The exit-multiple sensitivity row (S116:S120) is centred on
+    # S118 = M103, and the IRR/MOIC grid headers AC186 / X191 also pin to
+    # M103. If S118 / AC186 / X191 were formulas referencing M103, the grid
+    # would have a circular reference. Operator solves this manually by
+    # paste-as-value. The engine automates: after recalc, read M103, paste
+    # into the three targets, recalc, re-read M103, repeat until stable.
+    post_recalc_hardcode:
+      - source: "Hardcode_source_M103"           # = LBO!M103
+        targets:
+          - "Hardcode_S118"                      # = LBO!S118
+          - "Hardcode_AC186"                     # = LBO!AC186
+          - "Hardcode_X191"                      # = LBO!X191
+        converge: true
+        tolerance: 0.0001
+        max_iters: 10
+
+    # ----------------------------------------------------------------- validation
+    # Sanity rules evaluated after recalc. Engine fails the run on any false.
+    validation:
+      - rule: "outputs.ftev > 0"
+        message: "Entry FTEV (I76 / G96) must be positive"
+      - rule: "outputs.sponsor_equity > 0"
+        message: "Sponsor equity (G93) must be positive — check entry multiple x EBITDA vs debt quantum"
+      - rule: "outputs.tla_quantum >= 0"
+        message: "TLA quantum (G90) cannot be negative"
+      - rule: "outputs.tlb_quantum >= 0"
+        message: "TLB quantum (G91) cannot be negative"
+      - rule: "outputs.stub_period >= 0"
+        message: "Stub period (I29) cannot be negative — check Acq_date vs FYE_post_acq"
+      - rule: "outputs.stub_period <= 1"
+        message: "Stub period (I29) cannot exceed 1 year"
+      # Sanity check: IRR grid centre cell must be a valid number. None OR an
+      # Excel error string ('#N/A', '#REF!', etc.) means the returns calc
+      # failed. Most common cause: holding_period exceeded the template's
+      # projection horizon. The DemoDeal-shape template runs 9 periods
+      # (I5:Q5 = 2024:2032) and needs a post-exit period for cashflow rolls,
+      # so with Jun acquisition, max safe holding_period = 5.
+      - rule: "isinstance(outputs.irr_grid[4][4], (int, float))"
+        message: "IRR grid centre is not a number (None or Excel error). Most likely holding_period exceeds template projection horizon — for the DemoDeal-shape v4 template with acquisition mid-2026, max holding_period = 5."
+
+    # -------------------------------------------------- client_fs pre-write
+    # The lbo run optionally accepts a `client_fs` operating-model block
+    # (engine run lbo --client-fs <json-file>; excel_engine.run(client_fs=...))
+    # written into the Client_FS sheet BEFORE the input cells, inside one
+    # manual-calc window. This is how a run carries the deal's actual
+    # operating model instead of whatever sits in the template's Client_FS.
+    #
+    # JSON shape (row keys may be JSON strings; the engine coerces to int):
+    #   {
+    #     "dates":     ["2023-03-31", ...],     # EXACTLY 10 ISO dates -> Client_FS!J4:S4.
+    #                                           # These are the SUMIFS join keys OpModel_Link
+    #                                           # matches against the LBO timeline (the EDATE
+    #                                           # chain seeded by First_FYE) — keep consistent.
+    #     "rows":      {"6": [10 numbers], ...},# row number -> J:S values. Post-restructure
+    #                                           # Client_FS row map: 6=revenue, 13=EBITDA,
+    #                                           # 25=D&A, 32=ΔNWC, 38=capex ("Core 1" rows).
+    #     "zero_rows": [7, 8, ...],             # component rows blanked to 0.0
+    #     "sheet":     "Client_FS"              # optional; defaults to Client_FS
+    #   }
+    #
+    # UNITS CONTRACT: values are written VERBATIM — the engine applies NO
+    # x1e6 (or any) scaling. Client_FS holds full currency units, so the
+    # caller sends full values (17900000.0, not 17.9).
+    #
+    # SAFETY: the engine refuses (ClientFSFormulaCollision, exit 2) if any
+    # target cell holds a formula — Client_FS total rows (r11/r20/r30/r36/r43)
+    # are =SUM() formulas and must NEVER be written. A malformed block
+    # (row keys not ints, array length != dates length, partial window)
+    # is refused before Excel opens (ClientFSBlockInvalid, exit 1).
+    # Example payload: templates/inputs/lbo-client-fs-example.json.
+
+  # =====================================================================
+  # Future skills register here following the same pattern.
+  # See engine/README.md §"Adding a new template" for the worked checklist.
+  # =====================================================================
+  # dcf:
+  #   path: "os-templates/Project_x_DCF_date.xlsx"
+  #   ...
+  # sensitivity:
+  #   ...
+  # three_statement:
+  #   ...
+  # football_field:
+  #   ...
+  # audit_model:
+  #   ...

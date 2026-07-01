@@ -1,0 +1,43 @@
+{
+  "deal_name": "_LBO-Smoketest",
+  "first_fye": "2024-12-31",
+  "project_name": "DemoDeal",
+  "scenario_provider": "Management",
+  "currency": "GBP",
+  "fye_post_acq": "2026-12-31",
+  "tax_rate": 0.25,
+  "acq_multiple": 10.0,
+  "ebitda_basis": "Adj",
+  "acq_ebitda": 13.5,
+  "acq_date": "2026-06-30",
+  "holding_period": 5,
+  "ma_fees": 2.0,
+  "step_multiple": 0.5,
+  "debt_ebitda": 5.73,
+  "min_equity": 0.35,
+  "tla_split": 1.0,
+  "rcf_quantum": 25.0,
+  "rcf_switch": 0,
+  "pref_interest": 0.1,
+  "existing_net_debt": 0.0,
+  "scenario_1": null,
+  "scenario_2": null,
+  "scenario_3": null,
+  "scenario_selected": null,
+  "scenario_5": null,
+  "sweet_ord_pct": null,
+  "mgmt_ord_pct": null,
+  "sponsor_ord_pct": null,
+  "ord_pref_split": null,
+  "min_cash": null,
+  "citations": [
+    {
+      "field": "acq_ebitda",
+      "source_id": "src:DemoDeal-fy25-results"
+    },
+    {
+      "field": "acq_multiple",
+      "source_id": "operator-verbal:2026-05-29"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+# systemd --user unit for the HiNotes watcher daemon.
+#
+# Install:
+#   mkdir -p ~/.config/systemd/user
+#   cp "/mnt/x/Agentic OS/routines/scripts/hinotes-watcher.service" ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now hinotes-watcher
+#
+# Inspect:
+#   systemctl --user status hinotes-watcher
+#   journalctl --user -u hinotes-watcher -f
+#
+# Stop / restart:
+#   systemctl --user stop hinotes-watcher
+#   systemctl --user restart hinotes-watcher
+#
+# Note: WSL2 systemd --user requires WSL2 systemd to be enabled
+# (in /etc/wsl.conf, [boot] section: systemd=true). Verify with
+# `systemctl --version` from inside WSL.
+
+[Unit]
+Description=Agentic OS HiNotes transcript watcher
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=<user>/.venvs/agentic-routines/bin/hinotes-watcher start --vault "/mnt/x/OS AI Vault"
+Restart=on-failure
+RestartSec=10
+# Log to journald — view with `journalctl --user -u hinotes-watcher`
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

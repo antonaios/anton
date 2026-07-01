@@ -1,0 +1,181 @@
+/* v2 redesign typography — Geist (UI) + Geist Mono, self-hosted via
+ * @fontsource-variable/geist(+mono) (imported in src/main.tsx → bundled by Vite,
+ * no CDN, works offline at the prod :8765 path). The `mono` token stays a real
+ * monospace stack (Geist Mono), reserved for raw code/JSON <pre> + numerics. */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Theme tokens — LIGHT teal (default, :root) ↔ DARK navy+gold ([data-theme="navy"])
+   Token NAMES live in tailwind.config.js (every component themes without edits);
+   VALUES flip here. The toggle (src/lib/theme.ts) sets/removes data-theme on
+   <html>; the pre-paint script in index.html applies the stored choice before
+   first paint to avoid FOUC. ─────────────────────────────────────────────── */
+:root {
+  --bg:           #AECCCC;
+  --surface:      #F2F2F2;
+  --card:         #FAFBFB;
+  --paper2:       #DFEAEA;
+  --bubble-anton: #E9F3ED;   /* ANTON reply bubble — sage-tinted mint (theme-flips) */
+  --line:         #D8E5E5;
+  --line2:        #BFD6D6;
+  --ink:          #0F2624;
+  --slate:        #365956;
+  --mist:         #6E9290;
+  --faint:        #9DBFBE;
+  --accent:       #0F2624;
+  --accent-soft:  rgb(15 38 36 / 10%);
+  --accent-line:  rgb(15 38 36 / 28%);
+  --sage:         #4E9C6E;
+  --amber:        #B0823C;
+  --oxblood:      #B05A52;
+  /* sidebars / context rails (hardcoded teal in the design, tokenised here) */
+  --rail:         #3F8B88;
+  --rail-line:    rgb(255 255 255 / 14%);
+  /* structural-blue register (live / static) — on-palette teal in light */
+  --accent2:      #3F8B88;
+  --accent2-soft: rgb(63 139 136 / 14%);
+  --accent2-line: rgb(63 139 136 / 33%);
+  color-scheme: light;
+}
+
+[data-theme="navy"] {
+  /* Values lifted from the finalised Paper "B — Quiet desk" dark page (navy+gold):
+     deep near-black grounds, #0C0E10 surfaces, vivid amber-gold accent, the exact
+     ink/slate/mist text ramp + the LIVE green + meter blue. The v2 nav/context
+     rails (teal in light) take a deep navy so the theme reads "navy + gold"; their
+     light-on-surface text is hardcoded + theme-agnostic so it carries straight over. */
+  --bg:           #08090A;
+  --surface:      #0C0E10;
+  --card:         #131519;
+  --paper2:       #181A1F;
+  --bubble-anton: #15211C;   /* ANTON reply bubble — dark sage; readable under navy */
+  --line:         #20262F;
+  --line2:        #2C333D;
+  --ink:          #E8ECF2;
+  --slate:        #93A0B2;
+  --mist:         #7C8A9C;   /* ~5:1 on --card; passes AA. Lifts every text-t3 at once. */
+  --faint:        #3C4350;
+  --accent:       #6FA8DC;
+  --accent-soft:  rgb(111 168 220 / 14%);
+  --accent-line:  rgb(111 168 220 / 38%);
+  --sage:         #6BB083;
+  --amber:        #E8A04C;
+  --oxblood:      #C4685A;
+  --rail:         #131519;
+  --rail-line:    rgb(255 255 255 / 8%);
+  --accent2:      #5E83A8;
+  --accent2-soft: rgb(94 131 168 / 14%);
+  --accent2-line: rgb(94 131 168 / 33%);
+  color-scheme: dark;
+}
+
+@layer base {
+  html, body, #root {
+    @apply h-full bg-bg text-t1 antialiased;
+    font-family: "Geist Variable", "Geist", ui-sans-serif, system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.45;
+    font-feature-settings: "calt";
+  }
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* v5 scrollbars — themed via vars */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--line2);
+    border-radius: 4px;
+    border: 2px solid var(--bg);
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--faint); }
+  * { scrollbar-color: var(--line2) transparent; scrollbar-width: thin; }
+}
+
+@layer components {
+  /* card surface — soft elevation; shared by not-yet-hand-tuned tabs. */
+  .panel { @apply rounded-xl bg-bg-1 shadow-card overflow-hidden; }
+  .mono  { font-family: theme("fontFamily.mono"); font-variant-numeric: tabular-nums; }
+}
+
+@layer utilities {
+  .tabular { font-variant-numeric: tabular-nums; }
+}
+
+/* ─── Reduce motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─── Theme-toggle View Transition (circular wipe driven from theme.ts) ─────
+   Baseline 300ms crossfade; reduced-motion disables the VT animation. */
+::view-transition-old(root),
+::view-transition-new(root) { animation-duration: 300ms; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) { animation: none !important; }
+}
+
+/* ─── Spinner (ChatCanvas running state) ─────────────────────────────── */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Session list "running" pulse ────────────────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}
+
+/* ─── Desk status one-liner (ChatCanvas StatusLine, brief item 1) ───────── */
+/* Gentle dot pulse on the live phase line — mirrors the Paper `ms-pulse`. */
+@keyframes status-pulse {
+  0%, 100% { opacity: 1;   transform: scale(1);    }
+  50%      { opacity: 0.45; transform: scale(0.82); }
+}
+.status-pulse { animation: status-pulse 1.3s ease-in-out infinite; }
+
+/* Faint "answer streaming in" shimmer bars beneath the phase line. A muted
+   surface bar with a sweeping highlight (Paper `.ms-shim`). Reduced-motion is
+   handled both here (global rule zeroes the duration) and in JS (the bars don't
+   render at all), so a motion-sensitive user sees only the static phase text. */
+@keyframes status-shimmer {
+  from { background-position: -180px 0; }
+  to   { background-position: 220px 0;  }
+}
+.status-shimmer {
+  background-color: var(--surface);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--accent) 16%, transparent) 50%,
+    transparent 100%
+  );
+  background-size: 180px 100%;
+  background-repeat: no-repeat;
+  animation: status-shimmer 1.5s ease-in-out infinite;
+}
+
+/* ─── Ticker scrolling (dual-direction continuous scroll) ──────────────── */
+@keyframes ticker-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes ticker-right {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+.ticker-scroll {
+  animation-duration: 80s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.ticker-scroll-right { animation-name: ticker-right; }
+.ticker-scroll-left  { animation-name: ticker-left; }
+.ticker-wrap:hover .ticker-scroll { animation-play-state: paused; }

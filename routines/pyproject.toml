@@ -1,0 +1,110 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentic-os-routines"
+version = "0.1.0"
+description = "Python automation routines that operate on the Agentic OS vault — HiNotes ingestion, sector news, deal tracker, earnings tracker, dispatcher, audit log."
+readme = "README.md"
+requires-python = ">=3.13"
+authors = [{ name = "Operator Name", email = "operator@example.com" }]
+license = { text = "MIT" }
+
+dependencies = [
+    "watchdog>=6.0",
+    "pyyaml>=6.0",
+    "python-frontmatter>=1.1",
+    "requests>=2.32",
+    "click>=8.1",
+    "python-docx>=1.2",   # for HiNotes DOCX exports
+    "pypdf>=6.0",          # for HiNotes PDF exports (rare but possible)
+    "streamlit>=1.40",      # localhost dashboard MVP
+    "firecrawl-py>=4.0",    # web extraction for sector news / deal tracker / earnings
+    "tavily-python>=0.7",   # alternative search provider (auto-fallback from Firecrawl)
+    "openpyxl>=3.1",         # deal tracker / earnings tracker workbook writes
+    "fastapi>=0.115",        # HTTP bridge for the React dashboard (routines.api)
+    "python-multipart>=0.0.9",  # #chat-attachments — multipart/form-data upload parsing (FastAPI UploadFile)
+    "uvicorn>=0.30",         # ASGI server for the bridge
+    "pypdfium2>=4.30",       # PDF page rendering for the multimodal intake routine
+    "python-pptx>=1.0",      # #72 — PPTX→markdown intake converter (ported from markitdown)
+    "networkx>=3.0",         # #45 — vault_graph wikilink graph (was an undeclared runtime dep)
+    "apscheduler>=3.10,<4.0",  # #23 — bridge-embedded scheduler
+    "sqlalchemy>=2.0,<3.0",     # APScheduler SQLAlchemyJobStore backend
+    "cryptography>=42.0",       # #25 — Fernet for credentials encrypted-at-rest
+    "pywin32>=306; sys_platform == 'win32'",  # #25 — DPAPI key-wrap (Windows only)
+    "anthropic>=0.40",          # #75 — API-key fallback for cloud Claude lane when subprocess unavailable
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0",
+    "ruff>=0.6",
+]
+markets = [
+    # OpenBB SDK — AGPLv3, optional. Without this group, the markets adapter
+    # falls back to a deterministic stub provider.
+    "openbb>=4.4",
+]
+learning = [
+    # BERTopic clustering pipeline for the W4 D5 learning loop
+    # (`routines/learning/cluster.py`). Shipped in commit 72cf289
+    # (2026-05-14). Optional because the 80MB sentence-transformers
+    # model + native sklearn/HDBSCAN/UMAP/numba stack is a heavy install
+    # not needed for the bridge's hot path; install via `pip install
+    # -e .[learning]` to run the weekly clustering cron.
+    "bertopic>=0.17",
+    "umap-learn>=0.5",
+    "hdbscan>=0.8",
+    "sentence-transformers>=5.0",
+]
+recall = [
+    # #54-rerank — optional cross-encoder rerank stage for /recall
+    # (`routines/recall/rerank.py`, behind the per-query `rerank` flag,
+    # default OFF). The bge-reranker-v2-m3 weights are ~560MB and the
+    # FlagEmbedding/torch stack is heavy, so this is NOT a hot-path dep;
+    # without it recall runs the RRF-fused order unchanged (graceful
+    # skip). Install via `pip install -e .[recall]` to enable reranking.
+    # FlagEmbedding is the reference impl for bge-reranker-v2-m3;
+    # sentence-transformers is the CrossEncoder fallback the loader also
+    # accepts (already pulled in by the `learning` extra).
+    "FlagEmbedding>=1.3",
+    "sentence-transformers>=5.0",
+]
+
+[project.scripts]
+hinotes-watcher = "routines.hinotes.watcher:main"
+recall = "routines.recall.cli:main"
+sector-news = "routines.sectornews.cli:main"
+memory-promote = "routines.promotion.cli:main"
+deal-tracker = "routines.dealtracker.cli:main"
+earnings-tracker = "routines.earnings.cli:main"
+morning-brief = "routines.morning_brief.cli:main"
+daily-digest = "routines.daily_digest.cli:main"
+week-in-review = "routines.week_in_review.cli:main"
+project-chat = "routines.project_chat.cli:main"
+learn = "routines.learning.cli:main"
+lessons-learned = "routines.lessons.cli:main"
+pdf-intake = "routines.intake.cli:main"
+digest = "routines.digest.cli:main"
+sector-extract = "routines.sectors.cli:main"
+sector-note = "routines.sectors.cli:sector_note"
+bd-decay = "routines.bd.cli:main"
+vault-health = "routines.vault_health.cli:main"
+vault-graph = "routines.vault_graph.cli:main"
+actions-decay = "routines.projects.cli:main"
+agentic-api = "routines.api.app:main"
+lint-composites = "routines.composite.lint:main"
+stale-gate-sweep = "routines.stale_gate.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["routines*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q --strict-markers"

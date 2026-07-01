@@ -1,0 +1,45 @@
+﻿# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.python-version
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+build/
+dist/
+
+# --- Node / dashboard ---
+node_modules/
+dashboard/dist/
+npm-debug.log*
+yarn-error.log*
+
+# --- Secrets / env ---
+.env
+.env.local
+*.key
+*.pem
+
+# --- Runtime data (never publish) ---
+runs/
+state/
+metrics/
+telemetry/
+.logs/
+*.log
+.markets-cache/
+.recall-index/
+.understand-anything/
+.smart-env/
+
+# --- Editor / OS ---
+.obsidian/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

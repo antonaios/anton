@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentic-os-engine"
+version = "0.2.0"
+description = "Excel-template wrapper that drives Operator's DCF/LBO/comps templates via xlwings, providing a deterministic numerical engine for the Agentic OS."
+readme = "README.md"
+requires-python = ">=3.13"
+authors = [{ name = "Operator Name", email = "operator@example.com" }]
+license = { text = "MIT" }
+
+dependencies = [
+    "pandas>=2.2",
+    "numpy>=2.0",
+    "openpyxl>=3.1",
+    "xlwings>=0.32; sys_platform == 'win32'",  # Windows-only; only needed at runtime
+    "pyyaml>=6.0",
+    "click>=8.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=4.1",
+    "ruff>=0.6",
+    "mypy>=1.10",
+]
+
+[project.scripts]
+engine = "valuation.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["valuation*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q --strict-markers"

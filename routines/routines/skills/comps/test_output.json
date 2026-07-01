@@ -1,0 +1,34 @@
+{
+  "ok": true,
+  "stage": "approval_pending",
+  "stage_just_completed": 0,
+  "deal_name": "DemoDeal",
+  "target": "DemoDeal",
+  "run_id": "deadbeef",
+  "approval_payload": {
+    "kind": "subsectors",
+    "proposed": ["hotels-full-service", "hotels-limited-service", "hotels-lifestyle", "hotels-boutique"],
+    "rationale": {
+      "hotels-full-service":    "candidate from profile.md sector_sub_lens.hospitality",
+      "hotels-limited-service": "candidate from profile.md sector_sub_lens.hospitality",
+      "hotels-lifestyle":       "candidate from profile.md sector_sub_lens.hospitality",
+      "hotels-boutique":        "candidate from profile.md sector_sub_lens.hospitality"
+    },
+    "tracker_writes_planned": null
+  },
+  "approval_token_to_sign": "approve_subsectors_for=DemoDeal:deadbeef",
+  "warnings": [],
+  "approved_subsectors": null,
+  "blocks": null,
+  "headline_ev_ebitda_median": null,
+  "headline_ev_revenue_median": null,
+  "peer_count": null,
+  "deal_count": null,
+  "as_of": null,
+  "provider": null,
+  "template_path": null,
+  "prior_archived_path": null,
+  "mirror_refresh_path": null,
+  "tracker_writes": [],
+  "iron_law_assertion": null
+}

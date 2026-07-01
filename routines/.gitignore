@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.coverage
+htmlcov/
+
+# Local dotenv
+.env
+.env.local
+.env.*.local
+
+# Routine working state — log files, lock files, scratch
+runs/
+*.log
+*.lock
+*.pid
+
+# APScheduler SQLAlchemyJobStore (#23) — populated at bridge runtime
+state/
+
+# #25 credentials manager — encrypted-at-rest secrets + DPAPI-wrapped Fernet key.
+# Belt-and-braces: the parent ``state/`` rule already covers these, but explicit
+# entries protect against future .gitignore reorganisation. NEVER commit these.
+state/credentials.enc
+state/credentials.enc.tmp
+state/credentials.key.dpapi
+
+# Per-call LLM telemetry (#13) — local-only, contains workspace names
+# that could leak deal codenames in aggregate review. Surfaced via
+# /api/telemetry/llm-burn, never committed.
+telemetry/llm_calls.jsonl
+
+# #68 — @safe_audit failure log (sibling to runs/). Populated when an
+# observability write fails (disk full, locked DB, etc.). Operator-private
+# diagnostics; never committed.
+metrics/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.bak
+*~
+
+# Markets adapter SQLite TTL cache — populated at runtime by openbb_provider
+.markets-cache/
+
+# Local venv for the bridge (used by the scheduled-task autostart)
+.venv/
+
+# Codex-review scratch (diffs + verdicts) — local-only review artefacts, may
+# contain pasted source/diffs; never committed (mirrors the os-docs .review rule).
+.review/
+
+# Understand-Anything generated knowledge graph (regenerable via /understand)
+.understand-anything/

@@ -1,0 +1,25 @@
+{
+  "status": "ok",
+  "run_id": "deadbeef",
+  "as_of": "2026-06-05",
+  "provider": "stub",
+  "snapshots": [
+    {
+      "target_symbol": "JDW.L",
+      "target_name": "JD Wetherspoon",
+      "provider": "stub",
+      "note_path": null,
+      "rows": [
+        {"symbol": "JDW.L",  "name": "JD Wetherspoon",      "currency": "GBP", "fiscal_year": null, "revenue": null, "ebitda": null, "ebitda_margin": null, "revenue_growth_5y_cagr": null, "pe": null, "ev_ebitda": null, "net_debt_ebitda": null, "dividend_yield": null, "is_target": true},
+        {"symbol": "IHG.L",  "name": "IHG",                 "currency": "GBP", "fiscal_year": null, "revenue": null, "ebitda": null, "ebitda_margin": null, "revenue_growth_5y_cagr": null, "pe": null, "ev_ebitda": null, "net_debt_ebitda": null, "dividend_yield": null, "is_target": false},
+        {"symbol": "WTB.L",  "name": "Whitbread",           "currency": "GBP", "fiscal_year": null, "revenue": null, "ebitda": null, "ebitda_margin": null, "revenue_growth_5y_cagr": null, "pe": null, "ev_ebitda": null, "net_debt_ebitda": null, "dividend_yield": null, "is_target": false},
+        {"symbol": "MAB.L",  "name": "Mitchells & Butlers", "currency": "GBP", "fiscal_year": null, "revenue": null, "ebitda": null, "ebitda_margin": null, "revenue_growth_5y_cagr": null, "pe": null, "ev_ebitda": null, "net_debt_ebitda": null, "dividend_yield": null, "is_target": false},
+        {"symbol": "BOWL.L", "name": "Hollywood Bowl",      "currency": "GBP", "fiscal_year": null, "revenue": null, "ebitda": null, "ebitda_margin": null, "revenue_growth_5y_cagr": null, "pe": null, "ev_ebitda": null, "net_debt_ebitda": null, "dividend_yield": null, "is_target": false},
+        {"symbol": "SSPG.L", "name": "SSP Group",           "currency": "GBP", "fiscal_year": null, "revenue": null, "ebitda": null, "ebitda_margin": null, "revenue_growth_5y_cagr": null, "pe": null, "ev_ebitda": null, "net_debt_ebitda": null, "dividend_yield": null, "is_target": false}
+      ],
+      "warnings": []
+    }
+  ],
+  "warnings": [],
+  "duration_ms": 0
+}

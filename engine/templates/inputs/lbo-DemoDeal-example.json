@@ -1,0 +1,28 @@
+{
+  "_comment": "Example LBO inputs reproducing the DemoDeal template's current state. Use as a sanity-test fixture, OR as a starting point for a real deal — copy this file, rename, update values, run `engine run lbo --inputs <file> --deal <Deal>`.",
+  "_units": "EBITDA in £m. Multiples are 0.0x literal. Rates / fractions are decimals (0.25 = 25%). Dates are ISO YYYY-MM-DD.",
+
+  "first_fye":         "2024-12-31",
+  "project_name":      "DemoDeal",
+  "scenario_provider": "Management",
+  "currency":          "GBP",
+  "fye_post_acq":      "2026-12-31",
+  "tax_rate":          0.25,
+
+  "acq_multiple":      10,
+  "ebitda_basis":      "Adj",
+  "acq_ebitda":        13.5,
+  "acq_date":          "2026-06-30",
+  "holding_period":    5,
+  "ma_fees":           2,
+  "step_multiple":     0.5,
+
+  "debt_ebitda":       5.73,
+  "min_equity":        0.35,
+  "tla_split":         1,
+  "rcf_quantum":       25,
+  "rcf_switch":        0,
+  "pref_interest":     0.10,
+
+  "existing_net_debt": 0
+}

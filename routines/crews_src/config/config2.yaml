@@ -1,0 +1,25 @@
+# MetaGPT default config — deployed by install_metagpt step 4 to
+# <repo>\crews\config\config2.yaml (#31).
+#
+# WHY THIS EXISTS: metagpt 0.8.x runs ``Config.default()`` at IMPORT time
+# (metagpt/config2.py, bottom of module) and hard-fails with a pydantic
+# ValidationError when no ``llm:`` block is found in any config path —
+# the crew subprocess could not even ``from metagpt.actions import Action``
+# without this file. Found by the #31 real-boundary smoke run (2026-06-10);
+# the staged Phase-7 spec assumed a configured operator machine.
+#
+# MetaGPT resolves its package root to the process CWD (no .git there), and
+# the proxy always launches crews with cwd = <repo>\crews — so this
+# file is found deterministically. A ~/.metagpt/config2.yaml would OVERRIDE
+# it (later path wins in Config.default()); the operator machine keeps none.
+#
+# ANTON crews NEVER use this default LLM for role work — every role gets its
+# model via CrewInput.llm_config (bridge-resolved, sensitivity-gated). This
+# default exists only so the import succeeds, and it deliberately points at
+# the LOCAL Ollama lane so any stray default-LLM call inside MetaGPT stays
+# local per [[CLAUDE]] §5.2 (no cloud key, no cloud endpoint to leak to).
+
+llm:
+  api_type: "ollama"
+  base_url: "http://127.0.0.1:11434/api"
+  model: "qwen3:8b"
